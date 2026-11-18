@@ -32,7 +32,7 @@ export const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve
 /** Background picture with the coloured mask on top, as a JPEG data URL (for reports). */
 export async function composite(background: string | HTMLCanvasElement, overlay: HTMLCanvasElement, maxWidth = 900): Promise<string> {
   const bg = typeof background === 'string' ? await loadImage(background) : background;
-  const w = Math.min(maxWidth, bg.width), h = Math.round(bg.height * w / bg.width);
+  const w = maxWidth, h = Math.round(bg.height * w / bg.width);
   const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
   const ctx = canvas.getContext('2d')!;
   ctx.fillStyle = '#dce6d8'; ctx.fillRect(0, 0, w, h); ctx.drawImage(bg, 0, 0, w, h);
