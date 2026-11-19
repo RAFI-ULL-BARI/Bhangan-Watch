@@ -135,3 +135,6 @@ export const dhakaTime = (time: string, bn: boolean) =>
   new Date(time).toLocaleString(bn ? 'bn-BD' : 'en-GB', {timeZone: DHAKA, day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'});
 export const dhakaDay = (date: string, bn: boolean) =>
   new Date(date.slice(0, 10) + 'T12:00:00Z').toLocaleDateString(bn ? 'bn-BD' : 'en-GB', {timeZone: 'UTC', day: 'numeric', month: 'short'});
+/** Calendar date in Bangladesh for a UTC timestamp (a 23:55 UTC pass is the next morning in Dhaka). */
+export const dhakaLongDate = (time: string, bn: boolean) =>
+  new Date(time).toLocaleDateString(bn ? 'bn-BD' : 'en-GB', {timeZone: DHAKA, day: 'numeric', month: 'long', year: 'numeric'});

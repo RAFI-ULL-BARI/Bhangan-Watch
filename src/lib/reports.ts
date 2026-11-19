@@ -6,6 +6,7 @@ import {FLOOD, type FloodResult, type FloodStudy} from './flood';
 import {EROSION_PALETTE, FLOOD_PALETTE, composite, maskCanvas, radarCanvas} from './render';
 import {decodeUint8} from './codec';
 import {areaText, floodAreaText, longDate, peopleText, year} from './plain-language';
+import {dhakaLongDate} from './live-layers';
 
 export function download(filename: string, text: string, type = 'application/json') {
   const url = URL.createObjectURL(new Blob([text], {type}));
@@ -90,7 +91,7 @@ export function printFloodReport(s: FloodStudy, r: FloodResult, bn: boolean) {
   const overlay = maskCanvas(s.width, s.height, r.mask, FLOOD_PALETTE);
   openReport({
     title: bn ? `বন্যার পানি: ${s.nameBn}` : `Floodwater: ${s.name}`,
-    subtitle: `${bn ? 'স্যাটেলাইট রাডারের ছবি' : 'Satellite radar photo'} · ${longDate(s.event.date, bn)}`,
+    subtitle: `${bn ? 'স্যাটেলাইট রাডারের ছবি' : 'Satellite radar photo'} · ${(s.event.time ? dhakaLongDate(s.event.time, bn) : longDate(s.event.date, bn))}`,
     image: composite(radarCanvas(s.width, s.height, decodeUint8(s.event.vv)), overlay),
     legend: [['#1e6eff', bn ? 'বন্যার পানি (স্বাভাবিকের বাইরে)' : 'Floodwater (not usually there)'], ['#0c2648', bn ? 'সাধারণত পানি থাকে' : 'Usually water']],
     findings: [floodAreaText(r.floodedKm2, bn, gridAreaKm2(s)), peopleText(r.people, bn, true)].filter(Boolean),

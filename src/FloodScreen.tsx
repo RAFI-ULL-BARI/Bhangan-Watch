@@ -9,7 +9,7 @@ import {floodAreaText, floodCellMessage, longDate, num, peopleText, shortDate} f
 import {download, exportFloodCSV, exportFloodGeoJSON, printFloodReport} from '@/lib/reports';
 import {FLOOD_PALETTE, radarCanvas} from '@/lib/render';
 import type {RadarPass} from '@/lib/live-data';
-import {ago, dhakaTime} from '@/lib/live-layers';
+import {ago, dhakaLongDate, dhakaTime} from '@/lib/live-layers';
 import RiverMap from './RiverMap';
 
 const HERE = 'here', EXAMPLE = 'example';
@@ -101,7 +101,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
 
   const share = async () => {
     if (!study) return;
-    const url = location.href, text = t(`Floodwater seen by satellite: ${study.name}, ${longDate(study.event.date, false)}`, `স্যাটেলাইটে দেখা বন্যার পানি: ${study.nameBn}, ${longDate(study.event.date, true)}`);
+    const url = location.href, text = t(`Floodwater seen by satellite: ${study.name}, ${study.event.time ? dhakaLongDate(study.event.time, false) : longDate(study.event.date, false)}`, `স্যাটেলাইটে দেখা বন্যার পানি: ${study.nameBn}, ${study.event.time ? dhakaLongDate(study.event.time, true) : longDate(study.event.date, true)}`);
     try {
       if (navigator.share) await navigator.share({title: 'BhanganWatch', text, url});
       else {await navigator.clipboard.writeText(`${text}\n${url}`); setShared(true); setTimeout(() => setShared(false), 4000);}
@@ -121,7 +121,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
   const myCell = study && result && me && inBox(study.bbox, me) ? cellAt(study, me[0], me[1]) : null;
   const dateOptions = [
     ...(place.area.example ? [{value: EXAMPLE, label: `${bn ? place.area.example.bn : place.area.example.en} · ${shortDate(place.area.example.date, bn)}`}] : []),
-    ...(passes ?? []).map((p, i) => ({value: p.date, label: `${longDate(p.date, bn)}${i === 0 ? ` (${t('latest', 'সর্বশেষ')}, ${ago(p.time, bn)})` : ''}`})),
+    ...(passes ?? []).map((p, i) => ({value: p.date, label: `${dhakaLongDate(p.time, bn)}${i === 0 ? ` (${t('latest', 'সর্বশেষ')}, ${ago(p.time, bn)})` : ''}`})),
     ...(choice && choice !== EXAMPLE && !passes?.some(p => p.date === choice) ? [{value: choice, label: longDate(choice, bn)}] : []),
   ];
   const errorText = error === 'load' ? t('The satellite photo did not load. Check your connection and try again.', 'স্যাটেলাইটের ছবি লোড হয়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।')
@@ -156,7 +156,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
 
     {!busy && study && result && pictures && <>
       <section className="map-card" aria-labelledby="flood-title">
-        <div className="map-heading"><h2 id="flood-title">{bn ? study.nameBn : study.name} <span>· {longDate(study.event.date, bn)}</span></h2><div className="view-switch" role="group" aria-label={t('Map view', 'মানচিত্রের ধরন')}><button aria-pressed={!compare} onClick={() => setCompare(false)}>{t('Floodwater', 'বন্যার পানি')}</button><button aria-pressed={compare} onClick={() => setCompare(true)} disabled={!pictures.before}>{t('Radar photos', 'রাডারের ছবি')}</button></div></div>
+        <div className="map-heading"><h2 id="flood-title">{bn ? study.nameBn : study.name} <span>· {study.event.time ? dhakaLongDate(study.event.time, bn) : longDate(study.event.date, bn)}</span></h2><div className="view-switch" role="group" aria-label={t('Map view', 'মানচিত্রের ধরন')}><button aria-pressed={!compare} onClick={() => setCompare(false)}>{t('Floodwater', 'বন্যার পানি')}</button><button aria-pressed={compare} onClick={() => setCompare(true)} disabled={!pictures.before}>{t('Radar photos', 'রাডারের ছবি')}</button></div></div>
         {study.event.time && <p className="photo-age" role="status">{t(`Radar photo taken ${dhakaTime(study.event.time, false)} (Bangladesh time) · ${ago(study.event.time, false)}`, `রাডারের ছবি তোলা হয়েছে ${dhakaTime(study.event.time, true)} (বাংলাদেশ সময়) · ${ago(study.event.time, true)}`)}</p>}
         <RiverMap bbox={study.bbox} width={study.width} height={study.height} mask={result.mask} palette={FLOOD_PALETTE}
           before={pictures.before} after={pictures.after} labels={[pictures.beforeDate ? shortDate(pictures.beforeDate, bn) + t(' (dry)', ' (শুকনো)') : '', shortDate(study.event.date, bn)]}
