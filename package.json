@@ -2,7 +2,11 @@
   "name": "bhangan-watch",
   "private": true,
   "version": "1.0.0",
+  "description": "See floodwater and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.",
   "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -p . && vite build",

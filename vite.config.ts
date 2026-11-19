@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import {fileURLToPath, URL} from 'node:url';
 
-// BASE_PATH lets the same build run at a domain root or under /Bhangan-Watch/ on GitHub Pages.
+// Relative base works at a domain root (Vercel, Netlify) and in sub-folders; set BASE_PATH to override.
 export default defineConfig({
   base: process.env.BASE_PATH ?? './',
   plugins: [react(), tailwindcss()],

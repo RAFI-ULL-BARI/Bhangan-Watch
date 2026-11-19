@@ -1,111 +1,236 @@
+<div align="center">
+
+<img src="public/favicon.svg" width="72" height="72" alt="">
+
 # BhanganWatch · বন্যা ও নদীভাঙন
 
-**See where floodwater and riverbank erosion show up in free satellite photos of Bangladesh, in Bangla and English.**
+**See floodwater, rain and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.**
 
-BhanganWatch is a small, free web app for ordinary people, volunteers and local organisations. It runs entirely in the browser and works on a phone. It has no server, no account and no tracking.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FRAFI-ULL-BARI%2FBhangan-Watch&project-name=bhangan-watch)
+
+</div>
+
+BhanganWatch is a free web app for ordinary people, volunteers and local organisations. It works on any phone browser. It has **no server, no sign-up and no tracking**: everything runs in the browser and fetches public satellite data directly.
+
+<p align="center">
+  <img src="docs/screenshots/flood-sunamganj.jpg" width="66%" alt="Flood map of Sunamganj, June 2022, showing floodwater in blue and the usual river in navy">
+  <img src="docs/screenshots/mobile-bangla.jpg" width="24%" alt="The flood map on a phone, in Bangla">
+</p>
+
+---
+
+## Contents
+
+- [What it does](#what-it-does)
+- [Deploy on Vercel](#deploy-on-vercel)
+- [Run it on your computer](#run-it-on-your-computer)
+- [How it works](#how-it-works)
+- [Limits](#limits-please-read)
+- [Updating the prepared data](#updating-the-prepared-data)
+- [Project layout](#project-layout)
+- [Data sources and credits](#data-sources-and-credits)
+
+---
 
 ## What it does
 
 ### ⏱️ Now (এখন): the newest data for the whole country
-One map of Bangladesh with five switchable layers. Each one says how old it is, in Bangladesh time.
+One map of Bangladesh with five layers. Each layer says how old its data is, in Bangladesh time.
 
-| Layer | Source | How fresh | Detail |
-|---|---|---|---|
-| **Rain now** (with a slider to go back 12 h) | NASA GPM IMERG Early, via NASA GIBS | every 30 min, ~4–6 h behind | ~10 km |
-| **Radar flood map** (last 3 days) | Copernicus EMS Global Flood Monitoring (Sentinel-1), via GloFAS WMS | every radar pass, usually under a day | 20 m |
-| **NASA daily flood map** | LANCE MODIS NRT Global Flood Product (2-day), via NASA GIBS | daily | ~250 m, blocked by cloud |
-| **River forecast** (next 15 days) | Copernicus GloFAS flood summary and reporting points | issued daily | river network |
-| **Today's satellite photo** | VIIRS NOAA-20 true colour, via NASA GIBS | daily | ~375 m |
+| Layer | How fresh | Detail |
+|---|---|---|
+| 🌧️ **Rain now**, with a slider to look back 12 hours | every 30 min, about 4–6 h behind | ~10 km |
+| 🛰️ **Radar flood map** (last 3 days) | every Sentinel-1 pass, usually within a day | 20 m, sees through cloud |
+| 🌊 **NASA daily flood map** | daily | ~250 m, blocked by cloud |
+| 📈 **River forecast** (next 15 days) | issued daily | river network |
+| 📷 **Today's satellite photo** | daily | ~375 m |
 
-All of these are free, need no account and are called straight from the browser. **Check flooding around me in detail** opens the 60 m radar comparison for the newest pass over the user's location.
+<img src="docs/screenshots/now-rain.jpg" alt="The Now tab showing rain over Bangladesh" width="100%">
 
-**River water levels.** The official gauge readings belong to the Flood Forecasting and Warning Centre (FFWC). Its API (`api.ffwc.gov.bd`) refuses requests from other apps ("Invalid Security Header"), so BhanganWatch links to ffwc.gov.bd and the free 1090 line instead of copying the data. If FFWC grants API access, a river-levels layer could be added.
-
-**Why "near real time" and not live.** Radar satellites (Sentinel-1A, -1C and -1D) pass over any one place every few days. ESA publishes each scene about 7 hours after it is taken, and the flood maps follow soon after. Rain data is the freshest, at about 4–6 hours behind.
-
-### 🌊 Floods (বন্যা)
-- Uses **Sentinel-1 radar**, which sees through monsoon clouds and rain.
-- Compares a chosen day with the **dry season (January–March)** of the same year. It marks
+### 🌊 Floods (বন্যা): a detailed radar check for one place
+- Compares a Sentinel-1 radar photo with the **dry season** (January–March) of the same year, at about 60 m detail:
   - **blue**: water that is not usually there (likely floodwater)
   - **navy**: usual water (rivers, beels, haors)
-- Each map says when its radar photo was taken (for example "about 30 hours ago").
-- Pick a place with a past flood (Sunamganj 2022, Feni 2024, Kurigram and Sirajganj 2024) or **📍 around my location**. Then choose any satellite pass from the last four months; the newest is usually a few days old.
-- Tap any spot to see what each photo showed there. **Show my location** tells you what the photo showed where you are standing.
-- **Save a report**: a printable one-page report with a map. **Share** gives a link that opens the same place and date.
-- Shows the WorldPop 2020 estimate of how many people live where the water is (for the prepared areas), with a clear warning that it is a model.
-- Points people to the official warning services: FFWC (ffwc.gov.bd), **1090**, and **999** for emergencies.
+- Choose a past flood that loads instantly (Sunamganj 2022, Feni 2024, Kurigram 2024, Sirajganj 2024), or **📍 around my location** for any radar pass in the last four months.
+- **At your location** tells you what the photo showed where you are standing. Tap any spot to see what each photo saw there.
+- **Save a report** makes a printable one-page map. **Share** gives a link (works with WhatsApp) that opens the same place and date.
+- For the prepared areas, it shows a rough estimate of how many people live where the water is (WorldPop 2020).
+- It always points to the official services: [FFWC](https://www.ffwc.gov.bd), **1090** (free) and **999**.
 
 ### 🏞️ River erosion (নদীভাঙন)
-- Uses **Sentinel-2** optical photos from the dry season of several years (2020, 2023, 2025, plus any year from 2018 that you download).
-- Marks land that turned into river (red) and new char land (gold) along the Jamuna at Sirajganj and Fulchhari.
-- Offers CSV, GeoJSON and JSON downloads for researchers.
+- Compares dry-season Sentinel-2 photos of the Jamuna at **Sirajganj** and **Fulchhari** for 2020, 2023 and 2025. Any year from 2018 can be added on demand.
+- **Red** marks land that became river; **gold** marks new char land.
+- Researchers can download the results as CSV, GeoJSON or JSON.
+
+<img src="docs/screenshots/erosion-sirajganj.jpg" alt="Erosion map of the Jamuna at Sirajganj, 2020 to 2025" width="100%">
+
+---
+
+## Deploy on Vercel
+
+The app is a static site. Vercel builds it with the settings in [`vercel.json`](vercel.json), so you don't need to configure anything.
+
+> **Before you start:** Vercel deploys the repository's default branch (`main`). Merge the pull request with this work into `main` first. Alternatively, set the Production Branch in Vercel to the branch that has it.
+
+### Option A: one click
+1. Click **Deploy with Vercel** at the top of this page.
+2. Sign in with GitHub and pick a project name.
+3. Press **Deploy**. After about a minute you get a link like `https://bhangan-watch.vercel.app`.
+
+### Option B: import the repository
+1. Go to [vercel.com/new](https://vercel.com/new) and choose **Import Git Repository**.
+2. Select `Bhangan-Watch`. Vercel detects **Vite** and reads `vercel.json`:
+
+   | Setting | Value |
+   |---|---|
+   | Framework preset | Vite |
+   | Install command | `npm ci` |
+   | Build command | `npm run build` (type-check + build) |
+   | Output directory | `dist` |
+   | Node.js version | 20.19 or newer (22 recommended) |
+
+3. Press **Deploy**.
+
+After the first deploy, every push to `main` updates the live site, and every pull request gets its own preview link.
+
+### Option C: from the command line
+```bash
+npm i -g vercel
+```
+```bash
+vercel          # preview deployment
+```
+```bash
+vercel --prod   # production deployment
+```
+
+### Good to know
+- **No environment variables or API keys are needed.** All data sources are public.
+- **Location needs HTTPS.** Vercel provides it automatically, so "around my location" works on phones.
+- **Navigation uses `#` links** (for example `/#flood?area=feni`), so no rewrite rules are needed.
+- **`vercel.json`** also sets long-term caching for built files, one-day caching for `public/data`, and basic security headers.
+- **Other hosts** work too, since the `dist/` folder is plain static files: Netlify, Cloudflare Pages or GitHub Pages. For a sub-folder such as GitHub Pages, build with `BASE_PATH=/Bhangan-Watch/ npm run build`.
+
+---
+
+## Run it on your computer
+
+You need [Node.js](https://nodejs.org) 20.19 or newer.
+
+```bash
+git clone https://github.com/RAFI-ULL-BARI/Bhangan-Watch.git
+```
+```bash
+cd Bhangan-Watch
+```
+```bash
+npm install
+```
+```bash
+npm run dev
+```
+
+Then open http://localhost:5173.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | development server with live reload |
+| `npm test` | unit tests for the analysis code |
+| `npm run build` | type-check and build the site into `dist/` |
+| `npm run preview` | serve the built site locally |
+| `npm run prepare-data` | rebuild `public/data` from the satellite archives |
+
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs the tests and the build on every pull request and every push to `main`.
+
+---
 
 ## How it works
 
-| | Floods | Erosion |
-|---|---|---|
-| Satellite | Sentinel-1 RTC (VV radar) | Sentinel-2 L2A (green and near-infrared) |
-| Grid | ~60 m | ~100 m |
-| Water test | per-scene Otsu threshold, kept within −18…−13 dB | NDWI > 0.05 on clear pixels (scene classes 4, 5, 6) |
-| Comparison | water on the day, not water in at least half of the dry-season scenes; isolated cells dropped | no water in any clear earlier photo and water in at least ⅔ of clear later photos; ≥ 2 clear photos in each period |
+**Floods (detailed check).** Calm water reflects radar away from the satellite, so it looks very dark.
+1. Each Sentinel-1 radar photo gets its own water threshold, found automatically (Otsu's method) and kept within −18 to −13 dB.
+2. **Usual water** is water in at least half of the dry-season photos.
+3. **Floodwater** is water on the chosen day that isn't usual water. Isolated single cells are dropped as noise.
 
-Satellite scenes come from **Microsoft Planetary Computer**. Its data API crops, resamples and scales each scene on the server, so a whole area arrives as a small PNG (about 80 KB per scene). This lets a phone run a fresh flood check in about 10–20 seconds. The same code (`src/lib/sources.ts`) is used by the app and by the data-prep script.
+**River erosion.**
+1. Water means NDWI > 0.05, using only cloud-free pixels (Sentinel-2 scene classes 4, 5, 6).
+2. A cell **became river** if it had no water in any clear earlier photo and water in at least ⅔ of clear later photos.
+3. Each period needs at least 2 clear photos.
 
-**Known limits.** Radar cannot see water under trees, among homesteads or in towns, so flooding there is often missed. Feni in August 2024 is a clear example. Wind can roughen water; wet mud and smooth sand can look like water. In and after the monsoon, haors and low fields fill every year, so blue can be normal seasonal water. Photos are from one day and are not a live view. This app is **not** a warning service.
+**Getting the data.** Satellite scenes come from Microsoft Planetary Computer.
+- Its data API crops and scales each scene on the server, so one area arrives as a small PNG (about 80 KB).
+- A phone can run a fresh flood check in about 10–20 seconds.
+- The **Now** layers are map tiles from NASA GIBS and Copernicus GloFAS, loaded straight into the map.
+- The same code ([`src/lib/sources.ts`](src/lib/sources.ts)) runs in the browser and in the data-prep script.
 
-## Run it
+---
+
+## Limits (please read)
+
+- **Not live and not a warning service.** Radar passes any one place every few days, and rain data is a few hours old. Official warnings come from FFWC and 1090.
+- **Hidden water.** Radar cannot see water under trees, among homesteads or in town streets, so real flooding there is often missed. Feni in August 2024 is an example.
+- **Look‑alikes.** Wind can roughen water, and wet mud or smooth sand can look like water.
+- **Seasonal water.** During and after the monsoon, haors and low fields fill every year, so blue can be normal seasonal water.
+- **Erosion marks.** A red erosion mark does not prove land is lost for good, and no mark does not mean a place is safe.
+- **River water levels are not shown.** FFWC's data service only answers its own website, so the app links to [ffwc.gov.bd](https://www.ffwc.gov.bd) instead.
+
+---
+
+## Updating the prepared data
+
+`public/data/` holds the examples that load instantly. To rebuild them:
 
 ```bash
-npm install
-npm run dev        # http://localhost:5173
-npm test           # unit tests for the analysis code
-npm run build      # static site in dist/
+npm run prepare-data
 ```
-
-The site is fully static, so `dist/` can be hosted anywhere. Pushing to `main` builds and deploys it to **GitHub Pages** through `.github/workflows/deploy.yml`. To turn this on, go to *Settings → Pages → Source: GitHub Actions*.
-
-### Rebuilding the prepared data
-
-`public/data/` holds the instant-loading examples. To rebuild them from the satellite archives:
-
 ```bash
-npm run prepare-data                # everything (≈ 5 minutes)
-npm run prepare-data -- flood feni  # one flood example
-npm run prepare-data -- erosion     # erosion reaches only
+npm run prepare-data -- flood feni
+```
+```bash
+npm run prepare-data -- erosion
 ```
 
-Places, example dates and boxes are listed in `src/lib/areas.ts`. If you are behind a proxy, run Node with `NODE_USE_ENV_PROXY=1`.
+The first command rebuilds everything (about 5 minutes); the other two rebuild one flood example or only the erosion reaches. Places, example dates and map boxes are listed in [`src/lib/areas.ts`](src/lib/areas.ts). If you are behind a proxy, run Node with `NODE_USE_ENV_PROXY=1`.
+
+---
 
 ## Project layout
 
 ```
 src/
-  App.tsx              header, tabs, language
+  App.tsx              header, tabs, language switch
   NowScreen.tsx        near-real-time layers for the whole country
-  FloodScreen.tsx      flood map
-  ErosionScreen.tsx    erosion map
-  RiverMap.tsx         Leaflet map with overlay, compare slider and location pin
+  FloodScreen.tsx      detailed radar flood check
+  ErosionScreen.tsx    river erosion
+  RiverMap.tsx         map with overlay, compare slider and location pin
   ResearchPanel.tsx    About page and research papers
   lib/
     flood.ts           flood analysis (Sentinel-1)
     analysis.ts        erosion analysis (Sentinel-2)
-    sources.ts         turns satellite scenes into gridded observations (browser + Node)
-    pc.ts              Planetary Computer STAC search and crop client
+    sources.ts         satellite scenes → gridded observations (browser and Node)
+    pc.ts              Planetary Computer search and crop client
+    live-layers.ts     Now-tab layers and how fresh they are
     live-data.ts       browser downloads (loaded on demand)
-    live-layers.ts     near-real-time layer sources and their newest times
-    plain-language.ts  all the wording, in Bangla and English
+    plain-language.ts  all wording, in Bangla and English
     reports.ts         printable report and downloads
     grid.ts, codec.ts, render.ts, areas.ts
-scripts/prepare-data.ts  builds public/data
-tests/                   unit tests
+public/data/           prepared examples
+scripts/               data-prep script and small dev helpers
+tests/                 unit tests
+vercel.json            Vercel build, caching and security headers
 ```
 
-## Data and credits
+---
 
-- Contains modified **Copernicus Sentinel** data (ESA), processed by **Microsoft Planetary Computer**.
-- Population: **WorldPop** 2020 constrained estimate for Bangladesh (CC BY 4.0).
-- Near-real-time layers: **NASA GIBS** (GPM IMERG, LANCE NRT flood, VIIRS) and the **Copernicus Emergency Management Service** (GloFAS, Global Flood Monitoring).
-- Base map © **OpenStreetMap** contributors.
-- Research that shaped the project is listed on the app's About page (Freihardt & Frey 2023; Rahman 2022; Alam & Ahamed 2023; Islam & Mitra 2024).
+## Data sources and credits
 
-Student project by Rafiull Bari, Bangladesh.
+- **Satellite data:** contains modified Copernicus Sentinel-1 and Sentinel-2 data (ESA), processed by [Microsoft Planetary Computer](https://planetarycomputer.microsoft.com).
+- **Now layers:** [NASA GIBS](https://nasa-gibs.github.io/gibs-api-docs/) (GPM IMERG rain, LANCE MODIS NRT flood, VIIRS photo) and the [Copernicus Emergency Management Service](https://global-flood.emergency.copernicus.eu/) (GloFAS forecasts, Global Flood Monitoring).
+- **Population:** [WorldPop](https://www.worldpop.org) 2020 constrained estimate for Bangladesh (CC BY 4.0).
+- **Base map:** © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
+- **Research:** the project draws on Freihardt & Frey (2023), Rahman (2022), Alam & Ahamed (2023) and Islam & Mitra (2024), listed on the app's About page.
+
+**License:** none chosen yet. Add a `LICENSE` file to say how others may use the code.
+
+---
+
+<p align="center">Student project by <strong>Rafiull Bari</strong> · Bangladesh</p>
