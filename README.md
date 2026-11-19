@@ -6,11 +6,29 @@ BhanganWatch is a small, free web app for ordinary people, volunteers and local 
 
 ## What it does
 
+### ⏱️ Now (এখন): the newest data for the whole country
+One map of Bangladesh with five switchable layers. Each one says how old it is, in Bangladesh time.
+
+| Layer | Source | How fresh | Detail |
+|---|---|---|---|
+| **Rain now** (with a slider to go back 12 h) | NASA GPM IMERG Early, via NASA GIBS | every 30 min, ~4–6 h behind | ~10 km |
+| **Radar flood map** (last 3 days) | Copernicus EMS Global Flood Monitoring (Sentinel-1), via GloFAS WMS | every radar pass, usually under a day | 20 m |
+| **NASA daily flood map** | LANCE MODIS NRT Global Flood Product (2-day), via NASA GIBS | daily | ~250 m, blocked by cloud |
+| **River forecast** (next 15 days) | Copernicus GloFAS flood summary and reporting points | issued daily | river network |
+| **Today's satellite photo** | VIIRS NOAA-20 true colour, via NASA GIBS | daily | ~375 m |
+
+All of these are free, need no account and are called straight from the browser. **Check flooding around me in detail** opens the 60 m radar comparison for the newest pass over the user's location.
+
+**River water levels.** The official gauge readings belong to the Flood Forecasting and Warning Centre (FFWC). Its API (`api.ffwc.gov.bd`) refuses requests from other apps ("Invalid Security Header"), so BhanganWatch links to ffwc.gov.bd and the free 1090 line instead of copying the data. If FFWC grants API access, a river-levels layer could be added.
+
+**Why "near real time" and not live.** Radar satellites (Sentinel-1A, -1C and -1D) pass over any one place every few days. ESA publishes each scene about 7 hours after it is taken, and the flood maps follow soon after. Rain data is the freshest, at about 4–6 hours behind.
+
 ### 🌊 Floods (বন্যা)
 - Uses **Sentinel-1 radar**, which sees through monsoon clouds and rain.
 - Compares a chosen day with the **dry season (January–March)** of the same year. It marks
   - **blue**: water that is not usually there (likely floodwater)
   - **navy**: usual water (rivers, beels, haors)
+- Each map says when its radar photo was taken (for example "about 30 hours ago").
 - Pick a place with a past flood (Sunamganj 2022, Feni 2024, Kurigram and Sirajganj 2024) or **📍 around my location**. Then choose any satellite pass from the last four months; the newest is usually a few days old.
 - Tap any spot to see what each photo showed there. **Show my location** tells you what the photo showed where you are standing.
 - **Save a report**: a printable one-page report with a map. **Share** gives a link that opens the same place and date.
@@ -63,6 +81,7 @@ Places, example dates and boxes are listed in `src/lib/areas.ts`. If you are beh
 ```
 src/
   App.tsx              header, tabs, language
+  NowScreen.tsx        near-real-time layers for the whole country
   FloodScreen.tsx      flood map
   ErosionScreen.tsx    erosion map
   RiverMap.tsx         Leaflet map with overlay, compare slider and location pin
@@ -73,6 +92,7 @@ src/
     sources.ts         turns satellite scenes into gridded observations (browser + Node)
     pc.ts              Planetary Computer STAC search and crop client
     live-data.ts       browser downloads (loaded on demand)
+    live-layers.ts     near-real-time layer sources and their newest times
     plain-language.ts  all the wording, in Bangla and English
     reports.ts         printable report and downloads
     grid.ts, codec.ts, render.ts, areas.ts
@@ -84,6 +104,7 @@ tests/                   unit tests
 
 - Contains modified **Copernicus Sentinel** data (ESA), processed by **Microsoft Planetary Computer**.
 - Population: **WorldPop** 2020 constrained estimate for Bangladesh (CC BY 4.0).
+- Near-real-time layers: **NASA GIBS** (GPM IMERG, LANCE NRT flood, VIIRS) and the **Copernicus Emergency Management Service** (GloFAS, Global Flood Monitoring).
 - Base map © **OpenStreetMap** contributors.
 - Research that shaped the project is listed on the app's About page (Freihardt & Frey 2023; Rahman 2022; Alam & Ahamed 2023; Islam & Mitra 2024).
 

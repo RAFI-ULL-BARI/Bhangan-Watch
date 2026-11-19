@@ -71,12 +71,12 @@ export const FLOOD_CELL_M = 60;
 export const floodGrid = (bbox: BBox) => makeGrid(bbox, FLOOD_CELL_M, 360);
 const S1_PARAMS = {expression: '10*log10(vv)', asset_as_band: 'true', rescale: '-30,5', resampling: 'average'};
 
-export interface RadarPass {date: string; orbit: string; items: StacItem[]; coverage: number}
+export interface RadarPass {date: string; /** acquisition time (UTC, ISO) */ time: string; orbit: string; items: StacItem[]; coverage: number}
 
 export async function listRadarPasses(bbox: BBox, from: string, to: string, signal?: AbortSignal): Promise<RadarPass[]> {
   const items = await search('sentinel-1-rtc', bbox, `${from}/${to}`, {signal});
   return groupPasses(items)
-    .map(g => ({date: itemDate(g[0]), orbit: String(g[0].properties['sat:orbit_state'] ?? ''), items: g.filter(i => itemCoverage(i, bbox) > .02), coverage: passCoverage(g, bbox)}))
+    .map(g => ({date: itemDate(g[0]), time: g[0].properties.datetime, orbit: String(g[0].properties['sat:orbit_state'] ?? ''), items: g.filter(i => itemCoverage(i, bbox) > .02), coverage: passCoverage(g, bbox)}))
     .filter(p => p.items.length && p.coverage >= .5)
     .sort((a, b) => b.date.localeCompare(a.date) || b.coverage - a.coverage);
 }
@@ -88,7 +88,7 @@ async function readPass(pass: RadarPass, grid: Grid, decode: PngDecoder, signal?
     if (b.value.length !== n) continue;
     for (let i = 0; i < n; i++) if (!v[i] && b.valid[i]) v[i] = Math.max(1, b.value[i]);
   }
-  return {id: pass.items.map(i => i.id).join('+'), date: pass.date, orbit: pass.orbit, source: itemLink(pass.items[0]), vv: encodeUint8(v)};
+  return {id: pass.items.map(i => i.id).join('+'), date: pass.date, time: pass.time, orbit: pass.orbit, source: itemLink(pass.items[0]), vv: encodeUint8(v)};
 }
 
 /** Dry-season (January–March) passes before the event, preferring the same orbit direction. */

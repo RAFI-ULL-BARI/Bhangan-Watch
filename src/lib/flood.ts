@@ -14,6 +14,8 @@ import {decodeUint16, decodeUint8} from './codec';
 
 export interface RadarScene {
   id: string; date: string; orbit: string; source: string;
+  /** acquisition time (UTC, ISO); missing in older prepared files */
+  time?: string;
   /** base64 Uint8 per cell: 0 = no data, otherwise dB = −30 + v × 35 / 255 */
   vv: string;
 }

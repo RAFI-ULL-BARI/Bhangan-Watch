@@ -9,6 +9,7 @@ import {floodAreaText, floodCellMessage, longDate, num, peopleText, shortDate} f
 import {download, exportFloodCSV, exportFloodGeoJSON, printFloodReport} from '@/lib/reports';
 import {FLOOD_PALETTE, radarCanvas} from '@/lib/render';
 import type {RadarPass} from '@/lib/live-data';
+import {ago, dhakaTime} from '@/lib/live-layers';
 import RiverMap from './RiverMap';
 
 const HERE = 'here', EXAMPLE = 'example';
@@ -19,7 +20,7 @@ type Place = {area: Area; here?: [number, number]};
 function linkParams() {
   const q = new URLSearchParams(location.hash.split('?')[1] ?? '');
   const lat = Number(q.get('lat')), lng = Number(q.get('lng'));
-  return {area: q.get('area'), date: q.get('date'), here: q.has('lat') && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? [lat, lng] as [number, number] : null};
+  return {area: q.get('area'), date: q.get('date'), askHere: q.get('here') === '1', here: q.has('lat') && Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180 ? [lat, lng] as [number, number] : null};
 }
 const hereArea = ([lat, lng]: [number, number]): Area => ({id: HERE, name: 'Around your location', bn: 'আপনার অবস্থানের আশপাশ', bbox: boxAround(lat, lng, HERE_SIZE_KM)});
 const inBox = (b: BBox, [lat, lng]: [number, number]) => lng >= b[0] && lng <= b[2] && lat >= b[1] && lat <= b[3];
@@ -28,7 +29,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
   const t = (en: string, bangla: string) => bn ? bangla : en;
   const initial = useMemo(linkParams, []);
   const [place, setPlace] = useState<Place>(() => initial.here ? {area: hereArea(initial.here), here: initial.here} : {area: FLOOD_AREAS.find(a => a.id === initial.area) ?? FLOOD_AREAS[0]});
-  const [choice, setChoice] = useState<string>(initial.date && initial.date !== place.area.example?.date ? initial.date : place.area.example ? EXAMPLE : '');
+  const [choice, setChoice] = useState<string>(initial.askHere ? '' : initial.date && initial.date !== place.area.example?.date ? initial.date : place.area.example ? EXAMPLE : '');
   const [passes, setPasses] = useState<RadarPass[] | null>(null), [passError, setPassError] = useState(false);
   const [study, setStudy] = useState<FloodStudy | null>(null), [result, setResult] = useState<FloodResult | null>(null);
   const [busy, setBusy] = useState(false), [progress, setProgress] = useState(''), [error, setError] = useState<'' | 'load' | 'report' | 'none'>('');
@@ -78,7 +79,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
   };
 
   // Show something useful straight away: the example (or a shared link's date).
-  useEffect(() => {if (autoRun.current && choice) {autoRun.current = false; void run();}}, []);
+  useEffect(() => {if (initial.askHere) locate(true); else if (autoRun.current && choice) {autoRun.current = false; void run();}}, []);
 
   const choosePlace = (id: string) => {
     if (id === HERE) {locate(true); return;}
@@ -120,7 +121,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
   const myCell = study && result && me && inBox(study.bbox, me) ? cellAt(study, me[0], me[1]) : null;
   const dateOptions = [
     ...(place.area.example ? [{value: EXAMPLE, label: `${bn ? place.area.example.bn : place.area.example.en} · ${shortDate(place.area.example.date, bn)}`}] : []),
-    ...(passes ?? []).map((p, i) => ({value: p.date, label: `${longDate(p.date, bn)}${i === 0 ? t(' (latest)', ' (সর্বশেষ)') : ''}`})),
+    ...(passes ?? []).map((p, i) => ({value: p.date, label: `${longDate(p.date, bn)}${i === 0 ? ` (${t('latest', 'সর্বশেষ')}, ${ago(p.time, bn)})` : ''}`})),
     ...(choice && choice !== EXAMPLE && !passes?.some(p => p.date === choice) ? [{value: choice, label: longDate(choice, bn)}] : []),
   ];
   const errorText = error === 'load' ? t('The satellite photo did not load. Check your connection and try again.', 'স্যাটেলাইটের ছবি লোড হয়নি। ইন্টারনেট সংযোগ দেখে আবার চেষ্টা করুন।')
@@ -156,6 +157,7 @@ export default function FloodScreen({bn}: {bn: boolean}) {
     {!busy && study && result && pictures && <>
       <section className="map-card" aria-labelledby="flood-title">
         <div className="map-heading"><h2 id="flood-title">{bn ? study.nameBn : study.name} <span>· {longDate(study.event.date, bn)}</span></h2><div className="view-switch" role="group" aria-label={t('Map view', 'মানচিত্রের ধরন')}><button aria-pressed={!compare} onClick={() => setCompare(false)}>{t('Floodwater', 'বন্যার পানি')}</button><button aria-pressed={compare} onClick={() => setCompare(true)} disabled={!pictures.before}>{t('Radar photos', 'রাডারের ছবি')}</button></div></div>
+        {study.event.time && <p className="photo-age" role="status">{t(`Radar photo taken ${dhakaTime(study.event.time, false)} (Bangladesh time) · ${ago(study.event.time, false)}`, `রাডারের ছবি তোলা হয়েছে ${dhakaTime(study.event.time, true)} (বাংলাদেশ সময়) · ${ago(study.event.time, true)}`)}</p>}
         <RiverMap bbox={study.bbox} width={study.width} height={study.height} mask={result.mask} palette={FLOOD_PALETTE}
           before={pictures.before} after={pictures.after} labels={[pictures.beforeDate ? shortDate(pictures.beforeDate, bn) + t(' (dry)', ' (শুকনো)') : '', shortDate(study.event.date, bn)]}
           view={compare ? 'compare' : 'change'} marker={me} onPick={(lat, lng) => setCell(cellAt(study, lat, lng))} bn={bn}
