@@ -6,9 +6,8 @@
 
 **See floodwater, rain and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.**
 
-[![Live Demo - BhanganWatch](https://shields.io)](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18)
+**[🌐 Open BhanganWatch Live Demo (Sunamganj, June 18, 2022) →](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18)**
 
- 
 </div>
 
 BhanganWatch is a free web app for ordinary people, volunteers and local organisations. It works on any phone browser. It has **no server, no sign-up and no tracking**: everything runs in the browser and fetches public satellite data directly.
