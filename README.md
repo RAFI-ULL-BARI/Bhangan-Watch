@@ -6,7 +6,7 @@
 
 **See floodwater, rain and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FRAFI-ULL-BARI%2FBhangan-Watch&project-name=bhangan-watch)
+[![Deploy with Vercel](bhanganwatch.vercel.app)
 
 </div>
 
