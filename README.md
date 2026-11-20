@@ -6,7 +6,8 @@
 
 **See floodwater, rain and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.**
 
-[![Deploy with Vercel]([bhanganwatch.vercel.app](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18))
+[![Deploy with Vercel](https://vercel.com)](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18)
+
 
 </div>
 
