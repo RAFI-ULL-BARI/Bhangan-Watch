@@ -6,7 +6,7 @@
 
 **See floodwater, rain and riverbank erosion in free satellite data of Bangladesh, in Bangla and English.**
 
-**[🌐 Open BhanganWatch Live Demo (Sunamganj, June 18, 2022) →](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18)**
+**[🌐 Open BhanganWatch →](https://bhanganwatch.vercel.app/#flood?area=sunamganj&date=2022-06-18)**
 
 </div>
 
